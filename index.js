@@ -6,6 +6,8 @@ const mongoose = require('mongoose')
 const morgan = require('morgan')
 const path = require('path')
 const xss = require('xss-clean')
+const swaggerJsDocs = require('swagger-jsdoc')
+const swaggerUi = require('swagger-ui-express')
 
 const config = require('./config')
 
@@ -21,8 +23,37 @@ app.use(express.urlencoded({ extended: true }))
 app.use(xss())
 app.use(mongoSanitize())
 
+// <---------------swagger api docs--------------->
+const swaggerOptions = {
+  swaggerDefinition: {
+    openapi: '3.0.0',
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT'
+        }
+      }
+    },
+    info: {
+      title: 'Expence Tracker API',
+      description: 'API documentation for Expence Tracker',
+      version: '1.0.0'
+    },
+    servers: [
+      {
+        url: 'http://localhost:3000/api/v1'
+      }
+    ]
+  },
+  apis: ['./routes/v1/*.js', './routes/v1/Auth/*.js']
+}
+const swaggerDocs = swaggerJsDocs(swaggerOptions)
+
 app.use(express.static(path.join(__dirname, 'public')))
 app.use('/api/v1', require('./routes/v1'))
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 app.use(require('./routes/errors').clientErrorHandler)
 app.use(require('./routes/errors').errorHandler)
 
