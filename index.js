@@ -44,6 +44,9 @@ const swaggerOptions = {
     servers: [
       {
         url: 'http://localhost:3000/api/v1'
+      },
+      {
+        url: 'https://expence-tracker-6yui.onrender.com/api/v1'
       }
     ]
   },
